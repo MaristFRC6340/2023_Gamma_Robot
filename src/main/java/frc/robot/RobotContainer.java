@@ -51,9 +51,9 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.06),
-                MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.06),
-                MathUtil.applyDeadband(-m_driverController.getRightX(), 0.06),
+                MathUtil.applyDeadband(-m_driverController.getLeftY()*DriveConstants.SpeedMultiplier, 0.06),
+                MathUtil.applyDeadband(-m_driverController.getLeftX()*DriveConstants.SpeedMultiplier, 0.06),
+                MathUtil.applyDeadband(-m_driverController.getRightX()*DriveConstants.SpeedMultiplier, 0.06),
                 true),
             m_robotDrive));
   }
@@ -72,6 +72,11 @@ public class RobotContainer {
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+
+    new JoystickButton(m_driverController, XboxController.Button.kA.value)
+        .whileTrue(new RunCommand(
+        () -> m_robotDrive.zeroHeading(), 
+        m_robotDrive));
   }
 
   /**

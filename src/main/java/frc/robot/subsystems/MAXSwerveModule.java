@@ -110,6 +110,10 @@ public class MAXSwerveModule {
     m_drivingEncoder.setPosition(0);
   }
 
+  public double getAngle(){
+    return m_turningEncoder.getPosition();
+  }
+
   /**
    * Returns the current state of the module.
    *
