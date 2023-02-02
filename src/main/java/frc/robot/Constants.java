@@ -115,7 +115,8 @@ public final class Constants {
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int kDriverControllerPort = 1; // Updated 02 Feb 23
+    public static final int kArmControllerPort = 0;    // Updated 02 Feb 23
   }
 
   public static final class AutoConstants {
