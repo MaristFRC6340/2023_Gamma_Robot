@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -20,7 +21,9 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  // TODO: Define the controllers for driving / arm control in static form
   private static Joystick m_armControlJoystick = new Joystick(Constants.OIConstants.kArmControllerPort); // Port zero for left joystick
+  private static XboxController m_driverControlJoystick = new XboxController(Constants.OIConstants.kDriverControllerPort);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -88,6 +91,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.getArmCommand().schedule();
+    m_robotContainer.getDriveCommand().schedule();
   }
 
   /** This function is called periodically during operator control. */
@@ -106,6 +110,10 @@ public class Robot extends TimedRobot {
 
   public static Joystick getArmControlJoystick(){
     return m_armControlJoystick;
+  }
+
+  public static XboxController getDriveControlJoystick() {
+    return m_driverControlJoystick;
   }
 
 }
