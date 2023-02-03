@@ -19,6 +19,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
+import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,7 +42,8 @@ public class RobotContainer {
   private final ArmCommand armCommand = new ArmCommand(m_armSubsystem);
 
   // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  // TODO: Move this to a Static field in Robot Class
+  //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -51,16 +53,19 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
+    // Below commented out for refactoring
+    /* 
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                MathUtil.applyDeadband(-m_driverController.getLeftY()*DriveConstants.SpeedMultiplier, 0.06),
-                MathUtil.applyDeadband(-m_driverController.getLeftX()*DriveConstants.SpeedMultiplier, 0.06),
-                MathUtil.applyDeadband(-m_driverController.getRightX()*DriveConstants.SpeedMultiplier, 0.06),
+                MathUtil.applyDeadband(-Robot.getDriveControlJoystick().getLeftY()*DriveConstants.SpeedMultiplier, 0.06),
+                MathUtil.applyDeadband(-Robot.getDriveControlJoystick().getLeftX()*DriveConstants.SpeedMultiplier, 0.06),
+                MathUtil.applyDeadband(-Robot.getDriveControlJoystick().getRightX()*DriveConstants.SpeedMultiplier, 0.06),
                 true),
             m_robotDrive));
+    */
   }
 
   /**
@@ -73,12 +78,12 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverController, Button.kR1.value)
+    new JoystickButton(Robot.getDriveControlJoystick(), Button.kR1.value)
         .whileTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kA.value)
+    new JoystickButton(Robot.getDriveControlJoystick(), XboxController.Button.kA.value)
         .whileTrue(new RunCommand(
         () -> m_robotDrive.zeroHeading(), 
         m_robotDrive));
@@ -133,4 +138,9 @@ public class RobotContainer {
   public Command getArmCommand(){
     return armCommand;
   }
+
+  public Command getDriveCommand() {
+    return new DriveCommand(m_robotDrive);
+  }
+
 }
