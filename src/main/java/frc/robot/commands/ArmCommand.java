@@ -25,6 +25,8 @@ public class ArmCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    // Controls for Arm
     if(Robot.getArmControlJoystick().getRawButton(5)){
       arm.armUp();
     }
