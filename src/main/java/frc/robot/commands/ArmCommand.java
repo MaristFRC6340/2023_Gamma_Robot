@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.Robot;
@@ -12,6 +13,8 @@ public class ArmCommand extends CommandBase {
   /** Creates a new ArmCommand. */
 
   private final ArmSubsystem arm;
+  double leftY = 0, rightY = 0;
+  double leftX = 0, rightX = 0;
 
   public ArmCommand( ArmSubsystem arm) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -32,6 +35,34 @@ public class ArmCommand extends CommandBase {
     }
     if(Robot.getArmControlJoystick().getRawButton(3)){
       arm.armDown();
+    }
+
+    // Arm Length and Wrist Control
+    leftY = Robot.getArmControlJoystick().getRawAxis(1); //arm motor
+    
+    rightY = Robot.getArmControlJoystick().getRawAxis(5)/4; //wrist motor
+
+    leftX = Robot.getArmControlJoystick().getRawAxis(4);
+    
+    rightX = Robot.getArmControlJoystick().getRawAxis(0);
+
+    arm.setArmLengthMotorPower(MathUtil.applyDeadband(leftY, 0.06));
+
+    if(Robot.getArmControlJoystick().getRawButton(6)){ // lb
+      arm.armUp();
+    }
+    if(Robot.getArmControlJoystick().getRawButton(4)){ // rb
+      arm.armDown();
+    }
+
+    if (Robot.getArmControlJoystick().getRawAxis(2) > 0.25) {
+      arm.closeLeft();
+      arm.closeRight();
+    }
+
+    if (Robot.getArmControlJoystick().getRawAxis(3) > 0.25) {
+      arm.openLeft();
+      arm.openRight();
     }
 
   }

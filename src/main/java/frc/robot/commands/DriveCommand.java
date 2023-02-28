@@ -4,22 +4,25 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.DriveSubsystem;
+// import frc.robot.Constants.DriveConstants;
+// import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.GammaDriveSubsystem;
 
 public class DriveCommand extends CommandBase {
 
   // Field for DriveSubsystem
-  private final DriveSubsystem m_robotDrive;
+  private final GammaDriveSubsystem m_robotDrive;
 
 
   /** Creates a new DriveCommand. */
-  public DriveCommand(DriveSubsystem drive) {
+  public DriveCommand(GammaDriveSubsystem m_robotDrive2) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_robotDrive = drive;
+    m_robotDrive = m_robotDrive2;
   }
 
   // Called when the command is initially scheduled.
@@ -30,11 +33,18 @@ public class DriveCommand extends CommandBase {
   @Override
   public void execute() {
     // Updated Drive Command
-    m_robotDrive.drive(
-                MathUtil.applyDeadband(-Robot.getDriveControlJoystick().getLeftY()*DriveConstants.SpeedMultiplier, 0.06),
-                MathUtil.applyDeadband(-Robot.getDriveControlJoystick().getLeftX()*DriveConstants.SpeedMultiplier, 0.06),
-                MathUtil.applyDeadband(-Robot.getDriveControlJoystick().getRightX()*DriveConstants.SpeedMultiplier, 0.06),
-                true);
+    double forwardPower = Robot.getDriveControlJoystick().getRawAxis(1);
+    double turnPower = Robot.getDriveControlJoystick().getRawAxis(0);
+    double leftPower = (forwardPower - turnPower) * Constants.DriveConstants.SpeedMultiplier;
+    double rightPower = (forwardPower + turnPower) * Constants.DriveConstants.SpeedMultiplier;
+    m_robotDrive.drive(leftPower, rightPower);
+
+    double deltaZ = Robot.getRioAccell().getZ();
+    double deltaX = Robot.getRioAccell().getX();
+    double deltaY = Robot.getRioAccell().getY();
+    //System.out.println("Delta Z: " + deltaZ + ", DeltaX: " + deltaX);
+    System.out.println(deltaX + ", " + deltaY + ", " + deltaZ);
+
 
   }
 

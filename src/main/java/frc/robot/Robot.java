@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -23,7 +25,9 @@ public class Robot extends TimedRobot {
 
   // TODO: Define the controllers for driving / arm control in static form
   private static Joystick m_armControlJoystick = new Joystick(Constants.OIConstants.kArmControllerPort); // Port zero for left joystick
-  private static XboxController m_driverControlJoystick = new XboxController(Constants.OIConstants.kDriverControllerPort);
+  private static Joystick m_driverControlJoystick = new Joystick(Constants.OIConstants.kDriverControllerPort);
+
+  private static Accelerometer accelerometer = new BuiltInAccelerometer();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -62,7 +66,8 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getRampClimbTest();
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -112,8 +117,12 @@ public class Robot extends TimedRobot {
     return m_armControlJoystick;
   }
 
-  public static XboxController getDriveControlJoystick() {
+  public static Joystick getDriveControlJoystick() {
     return m_driverControlJoystick;
+  }
+
+  public static Accelerometer getRioAccell() {
+    return accelerometer;
   }
 
 }

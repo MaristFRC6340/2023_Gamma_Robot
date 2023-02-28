@@ -20,8 +20,15 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.RampClimbBangBang;
+import frc.robot.commands.RampClimbSequence;
+import frc.robot.commands.WristRotatePIDTestCommand;
+import frc.robot.commands.WristRotateTestCommand;
+import frc.robot.commands.WristTeleopCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.GammaDriveSubsystem;
+import frc.robot.subsystems.WristSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -36,8 +43,10 @@ import java.util.List;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final GammaDriveSubsystem m_robotDrive = new GammaDriveSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  private final DriveCommand driveCommand = new DriveCommand(m_robotDrive);
+  private final WristSubsystem m_wristSubsystem = new WristSubsystem();
 
   private final ArmCommand armCommand = new ArmCommand(m_armSubsystem);
 
@@ -68,6 +77,9 @@ public class RobotContainer {
     */
   }
 
+  private void configureButtonBindings() {
+  }
+
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
@@ -77,70 +89,36 @@ public class RobotContainer {
    * passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
-    new JoystickButton(Robot.getDriveControlJoystick(), Button.kR1.value)
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
-
-    new JoystickButton(Robot.getDriveControlJoystick(), XboxController.Button.kA.value)
-        .whileTrue(new RunCommand(
-        () -> m_robotDrive.zeroHeading(), 
-        m_robotDrive));
-       
-  }
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Create config for trajectory
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
-
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
-
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+    return null;
   }
   public Command getArmCommand(){
     return armCommand;
   }
 
   public Command getDriveCommand() {
-    return new DriveCommand(m_robotDrive);
+    return driveCommand;
+  }
+
+  public Command getWristRotateTestCommand() {
+    return new WristRotateTestCommand(m_wristSubsystem, -100);
+  }
+
+  public Command getWristPIDCommandTest() {
+    return new WristRotatePIDTestCommand(m_wristSubsystem, 0);
+  }
+
+  public Command getWristTeleopCommand() {
+    return new WristTeleopCommand(m_wristSubsystem, 10);
+  }
+
+  public Command getRampClimbTest() {
+    return new RampClimbSequence(m_robotDrive);
   }
 
 }
