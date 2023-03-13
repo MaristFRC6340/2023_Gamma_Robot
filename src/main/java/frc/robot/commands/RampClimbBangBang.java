@@ -15,11 +15,17 @@ public class RampClimbBangBang extends CommandBase {
   private int count = 0;
   private int frameCount = 0;
   private double totalDeltaY;
+  private double totalDeltaZ;
   private double avgDeltaY;
-  private int arraySize = 25;
+  private double avgDeltaZ;
+  private int arraySize = 10;
   private double deltaYValues [] = new double[arraySize];
+  private double deltaZValues [] = new double[arraySize]; 
 
   private double oldDeltaY = 0;
+  private double motorPower;
+
+  private double kP = 0.03;
 
   /** Creates a new RampClimbBangBang. */
   public RampClimbBangBang(GammaDriveSubsystem drive) {
@@ -39,31 +45,63 @@ public class RampClimbBangBang extends CommandBase {
   public void execute() {
 
     double deltaY = Robot.getRioAccell().getY();
+    double deltaZ = Robot.getRioAccell().getZ();
     deltaYValues[count] = deltaY;
+    deltaZValues[count] = deltaZ;
     
     totalDeltaY = 0;
+    totalDeltaZ = 0;
     for (int i = 0; i < deltaYValues.length; i++) {
       totalDeltaY += deltaYValues[i];
+      totalDeltaZ += deltaZValues[i];
     }
 
     avgDeltaY = totalDeltaY / deltaYValues.length;
+    avgDeltaZ = totalDeltaZ / deltaZValues.length;
+
     count++;
     if (count > deltaYValues.length-1) {
       count = 0;
     }
     
     frameCount++;
+
+    // Set Power
+    double theta = Math.atan2(avgDeltaZ, avgDeltaY);
+    theta = Math.toDegrees(theta);
+    theta -= 90;
+
+    // Pure Trig Flip - Flop Method
+    if (theta > 0) {
+      motorPower = Math.sin(Math.toRadians(theta - 90)) + 1;
+    }
+    else {
+      motorPower = -Math.sin(Math.toRadians(theta - 90)) - 1;
+    }
+
+    motorPower *= 2.5; // Scale Amplitude
+
+    /* PID and Trig Method
+    double m = kP * Math.abs(theta);
+
+    if (m > 0.5) {
+      m = 0.5;
+    }
+
+    motorPower = Math.sin(Math.toRadians(theta)) * m;
+    */
+
+    if (motorPower > 0.12) {
+      motorPower = 0.12;
+    }
+    if (motorPower < -0.12) {
+      motorPower = -0.12;
+    }
+
     //System.out.println(avgDeltaY);
     if (frameCount > 50) {
-      m_drive.drive(0.1, 0.1);
-    }
-    if (frameCount > 150) {
-      m_drive.drive(0.075, 0.075);
-    }
-    if (frameCount > 250) {
-      m_drive.drive(0.05, 0.05);
-    }
-    
+      m_drive.drive(motorPower, motorPower);
+    }    
 
 
   }
@@ -86,8 +124,16 @@ public class RampClimbBangBang extends CommandBase {
     }
 
     oldDeltaY = deltaY;
-    System.out.println(avgDeltaY + ", " + Math.abs(deltaY - oldDeltaY));
-    if (avgDeltaY > -0.15) {
+    double theta = Math.atan2(avgDeltaZ, avgDeltaY);
+    theta = Math.toDegrees(theta);
+    theta -= 90;
+
+    System.out.println("DeltaY: " + avgDeltaY + ", " + "DeltaZ: " + avgDeltaZ + ", "  + "Theta: " + theta + ", " + motorPower);
+
+
+
+    /* 
+    if (Math.abs(theta) < 4) {
       
       if (frameCount > 100) {
         return true;
@@ -100,6 +146,8 @@ public class RampClimbBangBang extends CommandBase {
     else {
       return false;
     }
+    */
+    return false;
     
   }
 }
