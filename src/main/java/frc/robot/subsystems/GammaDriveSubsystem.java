@@ -11,8 +11,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
 import frc.robot.Robot;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
@@ -27,10 +28,12 @@ public class GammaDriveSubsystem extends SubsystemBase {
   private RelativeEncoder m_leftEncoder;
   private RelativeEncoder m_rightEncoder;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
+  public AHRS gyro;
 
   /** Creates a new DriveTrain. */
   public GammaDriveSubsystem() {
-
+    gyro = new AHRS(SPI.Port.kMXP);
+    
     leftFront = new CANSparkMax(13, MotorType.kBrushless);
     leftRear = new CANSparkMax(5, MotorType.kBrushless);
     rightFront = new CANSparkMax(4, MotorType.kBrushless);
@@ -134,6 +137,6 @@ public class GammaDriveSubsystem extends SubsystemBase {
     leftRear.setIdleMode(CANSparkMax.IdleMode.kBrake);
     rightFront.setIdleMode(CANSparkMax.IdleMode.kBrake);
     rightRear.setIdleMode(CANSparkMax.IdleMode.kBrake);
-  }
+  } 
 
 }
